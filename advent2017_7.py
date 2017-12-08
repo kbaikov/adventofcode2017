@@ -7,38 +7,53 @@ from functools import lru_cache
 from collections import Counter
 from pprint import pprint
 import copy
-import anytree
+from anytree import Node, RenderTree
+import csv
+
+
+def create_nodes(s):
+    try:
+        node, value, _, *children = s
+        for i, child in enumerate(children):
+            children[i] = child.replace(",", "")
+        globals()[node] = Node(node)
+        node_list.append(node)
+    except ValueError as e:
+        node, value = s
+        globals()[node] = Node(node)
+        node_list.append(node)
+
+
+def assign_children(s):
+    try:
+        node, value, _, *children = s
+        for i, child in enumerate(children):
+            children[i] = child.replace(",", "")
+        node.children = children
+    except:
+        pass
 
 
 def main(bank):
     pass
 
+
 if __name__ == '__main__':
-    seen = []
+    node_list = []
     initial = dict()
-    with open('input_advent2017_7.txt') as file:
-        for index, line in enumerate(file.readline().strip().split(), 1):
-            initial[index] = int(line)
-    print(initial)
-    print(main(initial))
+    with open('temp') as file:
+        reader = csv.reader(file, delimiter=' ')
+        for row in reader:
+            create_nodes(row)
+            assign_children(row)
+    print(node_list)
+    print(ugml.children)
+    print(RenderTree(ugml))
+    # print(initial)
+    # print(main(initial))
     # print(main({1:0, 2:2, 3:7, 4:0}))
 
 
-input = """
-pbga (66)
-xhth (57)
-ebii (61)
-havc (66)
-ktlj (57)
-fwft (72) -> ktlj, cntj, xhth
-qoyq (66)
-padx (45) -> pbga, havc, qoyq
-tknk (41) -> ugml, padx, fwft
-jptl (61)
-ugml (68) -> gyxo, ebii, jptl
-gyxo (61)
-cntj (57)
-"""
 output = """
 
                 gyxo

@@ -1,11 +1,23 @@
 import pytest
 
-from advent2017_8 import is_consistent
+from advent2017_8 import condition, action
+
+
+@pytest.fixture
+def reg():
+    return {'registers': {'a': 5}}
+
+
+def pytest_namespace():
+    return {'registers': {'a': 5}}
 
 
 @pytest.mark.parametrize("input, expected", [
-    ({1: 2, 2: 2, 3: 2, 4: 2}, True),
-    ({1: 2, 2: 2, 3: 3, 4: 2}, False),
+    (('a', '>', 1), True),
+    (('a', '<', 1), False),
 ])
-def test_is_consistent(input, expected):
-    assert is_consistent(input) == expected
+def test_condition(input, expected, monkeypatch):
+    registers = {'a': 5}
+    # monkeypatch.setattr(registers, "a", 5)
+    # registers = pytest.registers
+    assert condition(*input) == expected

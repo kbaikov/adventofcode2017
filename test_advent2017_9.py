@@ -1,23 +1,11 @@
 import pytest
 
-from advent2017_9 import main
-
-
-@pytest.fixture
-def reg():
-    return {'registers': {'a': 5}}
-
-
-def pytest_namespace():
-    return {'registers': {'a': 5}}
+from advent2017_9 import clean_exclamation
 
 
 @pytest.mark.parametrize("input, expected", [
-    (('a', '>', 1), True),
-    (('a', '<', 1), False),
+    ('aaa!ddd!!cc', 'aaaddcc'),
+    ('!!!!a', 'a'),
 ])
-def test_condition(input, expected, monkeypatch):
-    registers = {'a': 5}
-    # monkeypatch.setattr(registers, "a", 5)
-    # registers = pytest.registers
-    assert condition(*input) == expected
+def test_clean_exclamation(input, expected):
+    assert clean_exclamation(input) == expected

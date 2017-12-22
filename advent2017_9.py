@@ -21,7 +21,7 @@ def clean_exclamation(s):
         return s
     if s[0] == '!':
         return clean_exclamation(s[2:])
-    return s[0] + clean_exclamation(s[1:])  
+    return s[0] + clean_exclamation(s[1:])
 
 
 def main():

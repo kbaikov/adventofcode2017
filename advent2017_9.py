@@ -17,16 +17,37 @@ log.basicConfig(level=LOGLEVEL)
 
 
 def clean_exclamation(s):
-    if '!' not in s:
-        return s
-    if s[0] == '!':
-        return clean_exclamation(s[2:])
-    return s[0] + clean_exclamation(s[1:])
+    while "!" in s:
+        start = s.find('!')
+        s = s[:start] + s[start + 2:]
+    return s
+
+
+def clean_garbage(s):
+    l = 0
+    while '<' in s:
+        start = s.find('<')
+        end = s.find('>')
+        l += len(s[start+1:end])
+        s = s[:start] + s[end+1:]
+    print(l)
+    return s
+
+
+def score_group(s):
+    counter = score = 0
+    for char in s:
+        if char == "{":
+            counter += 1
+        if char == "}":
+            score += counter
+            counter -= 1
+    return score
 
 
 def main():
-    print(clean_exclamation('aaa!ddd!!cc'))
-    # with open('input_advent2017_9.txt') as file:
+    with open('input_advent2017_9.txt') as file:
+        print(score_group(clean_garbage(clean_exclamation(file.readline()))))
 
 
 if __name__ == '__main__':

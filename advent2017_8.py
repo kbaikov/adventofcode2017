@@ -16,7 +16,7 @@ LOGLEVEL = os.environ.get('LOGLEVEL', 'WARNING').upper()
 log.basicConfig(level=LOGLEVEL)
 
 
-def condition(r, a, n):
+def condition(r, a, n, registers):
     if a == '>':
         return registers[r] > n
     elif a == '<':
@@ -31,16 +31,12 @@ def condition(r, a, n):
         return registers[r] <= n
 
 
-def action(r, a, n):
+def action(r, a, n, registers):
     if a == 'inc':
         registers[r] += n
     else:
         registers[r] -= n
-
-
-def main(s):
-    if condition(s['cond_register'], s['cond_action'], int(s['cond_number'])):
-        action(s['register'], s['action'], int(s['number']))
+    return registers
 
 
 if __name__ == '__main__':
@@ -61,7 +57,8 @@ if __name__ == '__main__':
             registers[row["register"]] = 0
         file.seek(0)
         for row in reader:
-            main(row)
+            if condition(row['cond_register'], row['cond_action'], int(row['cond_number']), registers):
+                registers = action(row['register'], row['action'], int(row['number']), registers)
             if all_time_max < max(registers.values()):
                 all_time_max = max(registers.values())
     print(max(registers.values()), all_time_max)

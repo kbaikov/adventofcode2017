@@ -136,6 +136,5 @@ def main():
     print(part2('nbysizxe'))
 
 
-
 if __name__ == '__main__':
     sys.exit(main())

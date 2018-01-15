@@ -23,11 +23,24 @@ def spinlock(steps):
     current_position = 0
     for value in range(1, 2018):
         current_position = (current_position + steps) % len(a)
-        a.insert(current_position+1, value)
+        a.insert(current_position + 1, value)
         current_position += 1
     return a
 
-        
+
+def spinlock_fast(steps):
+    """
+    from https://github.com/nedbat/adventofcode2017/blob/master/day17.py
+    """
+    a = [0]
+    current_position = 0
+    for value in range(1, 50_000_000):
+        current_position = (current_position + steps) % value + 1
+        if current_position == 1:
+            v = value
+    return v
+
+
 def part1():
     final_list = spinlock(348)
     needed_value = final_list[final_list.index(2017) + 1]
@@ -35,8 +48,7 @@ def part1():
 
 
 def part2():
-    pass
-
+    print(spinlock_fast(348))
 
 
 def main():

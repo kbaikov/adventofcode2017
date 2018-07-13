@@ -13,7 +13,7 @@ from functools import lru_cache
 from itertools import accumulate, cycle, dropwhile, permutations, count
 from pprint import pprint
 
-LOGLEVEL = os.environ.get('LOGLEVEL', 'WARNING').upper()
+LOGLEVEL = os.environ.get("LOGLEVEL", "WARNING").upper()
 log.basicConfig(level=LOGLEVEL)
 
 
@@ -23,16 +23,16 @@ def cycle_scanner(le, direction=True):
     l[current_position] = None
     if direction:
         try:
-            l[current_position + 1] = 'S'
+            l[current_position + 1] = "S"
         except IndexError:
-            l[current_position - 1] = 'S'
+            l[current_position - 1] = "S"
             direction = False
     else:
         if current_position == 0:
-            l[current_position + 1] = 'S'
+            l[current_position + 1] = "S"
             direction = True
         else:
-            l[current_position - 1] = 'S'
+            l[current_position - 1] = "S"
     return l, direction
 
 
@@ -91,16 +91,18 @@ def part2_non_brute_force(d):
             return delay
 
 
-if __name__ == '__main__':
-    dd = {0: (['S', None, None], True),
-          1: (['S', None], True),
-          2: None,
-          3: None,
-          4: (['S', None, None, None], True),
-          5: None,
-          6: (['S', None, None, None], True)}
+if __name__ == "__main__":
+    dd = {
+        0: (["S", None, None], True),
+        1: (["S", None], True),
+        2: None,
+        3: None,
+        4: (["S", None, None, None], True),
+        5: None,
+        6: (["S", None, None, None], True),
+    }
     firewall_dict = dict.fromkeys(range(99))
-    with open('input_advent2017_13.txt') as file:
+    with open("input_advent2017_13.txt") as file:
         for line in file:
             k, _, v = line.partition(":")
             firewall_dict[int(k)] = [None for _ in range(int(v))]

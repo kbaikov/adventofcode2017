@@ -52,11 +52,11 @@ def difference(s):
     return max(l) - min(l)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     node_list = []
     initial = dict()
-    with open('input_advent2017_7.txt') as file:
-        reader = csv.reader(file, delimiter=' ')
+    with open("input_advent2017_7.txt") as file:
+        reader = csv.reader(file, delimiter=" ")
         for row in reader:
             create_nodes(row)
         file.seek(0)

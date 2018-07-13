@@ -5,11 +5,11 @@
 def advent_sum(a):
     matches = []
     for i, item in enumerate(a[:-1]):
-        if item == a[i+1]:
+        if item == a[i + 1]:
             matches.append(int(item))
     if a[-1] == a[0]:
         matches.append(int(a[-1]))
-    return(sum(matches))
+    return (sum(matches))
 
 
 def advent_half_list_sum(a):
@@ -24,11 +24,11 @@ def advent_half_list_sum(a):
                 matches.append(int(item))
     # if a[-1] == a[0]:
     #     matches.append(int(a[-1]))
-    return(sum(matches))
+    return (sum(matches))
 
 
-if __name__ == '__main__':
-    with open('input_advent2017_1.txt') as file:
+if __name__ == "__main__":
+    with open("input_advent2017_1.txt") as file:
         for line in file:
             print(advent_sum((line.strip())))
             print(advent_half_list_sum((line.strip())))

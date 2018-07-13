@@ -21,10 +21,11 @@ def no_anagrams(s):
             return False
     return True
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     num_of_valid = 0
-    with open('input_advent2017_4.txt') as file:
+    with open("input_advent2017_4.txt") as file:
         for line in file:
             if no_duplicates(line) and no_anagrams(line):
-                num_of_valid +=1
+                num_of_valid += 1
         print(num_of_valid)

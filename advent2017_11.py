@@ -13,7 +13,7 @@ import logging as log
 import os
 import sys
 
-LOGLEVEL = os.environ.get('LOGLEVEL', 'WARNING').upper()
+LOGLEVEL = os.environ.get("LOGLEVEL", "WARNING").upper()
 log.basicConfig(level=LOGLEVEL)
 
 
@@ -40,12 +40,12 @@ def distance_to_origin(x, y, z):
 def main():
     x = y = z = 0
     all_distances = []
-    with open('input_advent2017_11.txt') as file:
+    with open("input_advent2017_11.txt") as file:
         for direction in file.readline().strip().split(","):
             x, y, z = make_a_step(x, y, z, direction)
             all_distances.append(distance_to_origin(x, y, z))
     print(distance_to_origin(x, y, z), max(all_distances))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

@@ -45,16 +45,16 @@ def main(bank):
     while True:
         new_bank = redistribute(copy.deepcopy(new_bank))
         if new_bank == target:
-            return step, step_found, step - step_found +1
+            return step, step_found, step - step_found + 1
         else:
             seen.append(new_bank)
             step += 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     seen = []
     initial = dict()
-    with open('input_advent2017_6.txt') as file:
+    with open("input_advent2017_6.txt") as file:
         for index, line in enumerate(file.readline().strip().split(), 1):
             initial[index] = int(line)
     print(initial)

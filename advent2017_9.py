@@ -12,24 +12,24 @@ import logging as log
 import os
 import sys
 
-LOGLEVEL = os.environ.get('LOGLEVEL', 'WARNING').upper()
+LOGLEVEL = os.environ.get("LOGLEVEL", "WARNING").upper()
 log.basicConfig(level=LOGLEVEL)
 
 
 def clean_exclamation(s):
     while "!" in s:
-        start = s.find('!')
+        start = s.find("!")
         s = s[:start] + s[start + 2:]
     return s
 
 
 def clean_garbage(s):
     l = 0
-    while '<' in s:
-        start = s.find('<')
-        end = s.find('>')
-        l += len(s[start+1:end])
-        s = s[:start] + s[end+1:]
+    while "<" in s:
+        start = s.find("<")
+        end = s.find(">")
+        l += len(s[start + 1:end])
+        s = s[:start] + s[end + 1:]
     print(l)
     return s
 
@@ -46,9 +46,9 @@ def score_group(s):
 
 
 def main():
-    with open('input_advent2017_9.txt') as file:
+    with open("input_advent2017_9.txt") as file:
         print(score_group(clean_garbage(clean_exclamation(file.readline()))))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

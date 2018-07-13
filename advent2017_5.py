@@ -35,7 +35,7 @@ def process_3_or_more(instructions):
             step_number += 1
             current_index = next_index
             jump_value = instructions[current_index]
-            if jump_value >=3:
+            if jump_value >= 3:
                 instructions[current_index] -= 1
             else:
                 instructions[current_index] += 1
@@ -45,11 +45,10 @@ def process_3_or_more(instructions):
             return step_number
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     instructions = dict()
-    with open('input_advent2017_5.txt') as file:
+    with open("input_advent2017_5.txt") as file:
         for index, line in enumerate(file, 1):
             instructions[index] = int(line.strip())
-    print(process_3_or_more({1:0, 2:3, 3:0, 4:1, 5:-3}))
+    print(process_3_or_more({1: 0, 2: 3, 3: 0, 4: 1, 5: -3}))
     print(process_3_or_more(instructions))

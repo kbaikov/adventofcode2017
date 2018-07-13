@@ -13,7 +13,7 @@ import logging as log
 import os
 import sys
 
-LOGLEVEL = os.environ.get('LOGLEVEL', 'WARNING').upper()
+LOGLEVEL = os.environ.get("LOGLEVEL", "WARNING").upper()
 log.basicConfig(level=LOGLEVEL)
 
 
@@ -38,11 +38,9 @@ def one_round(length_sequence, current_position, skip_size, init_list):
     for length in length_sequence:
         result_list = insert_from(
             current_position,
-            select_reverse(
-                current_position,
-                length,
-                init_list),
-            init_list)
+            select_reverse(current_position, length, init_list),
+            init_list,
+        )
         current_position += length + skip_size
         if current_position >= len(result_list):
             current_position = current_position % len(result_list)
@@ -60,11 +58,11 @@ def knot_hash(input_string):
     lengths.extend([17, 31, 73, 47, 23])
     for i in range(64):
         mega_list, current_position, skip_size = one_round(
-            lengths, current_position, skip_size, mega_list)
+            lengths, current_position, skip_size, mega_list
+        )
     chunks = [mega_list[x:x + 16] for x in range(0, len(mega_list), 16)]
-    dense_hash = [list(accumulate(chunk, func=operator.xor))[-1]
-                  for chunk in chunks]
-    hash_string = "".join([format(x, '02x') for x in dense_hash])
+    dense_hash = [list(accumulate(chunk, func=operator.xor))[-1] for chunk in chunks]
+    hash_string = "".join([format(x, "02x") for x in dense_hash])
     return hash_string
 
 
@@ -73,25 +71,28 @@ def to_bin(s):
 
 
 def part1(s):
-    input_rows = [s + '-' + '{}'.format(n) for n in range(128)]
+    input_rows = [s + "-" + "{}".format(n) for n in range(128)]
     input_rows_hashes = [knot_hash(i) for i in input_rows]
-    input_rows_bin = [''.join(map(to_bin, digits))
-                      for digits in input_rows_hashes]
+    input_rows_bin = ["".join(map(to_bin, digits)) for digits in input_rows_hashes]
     total_sum = 0
     for row in input_rows_bin:
-        total_sum += row.count('1')
+        total_sum += row.count("1")
     return total_sum
 
 
-Point = namedtuple('Point', 'x y')
+Point = namedtuple("Point", "x y")
 
 
 # part2 is from https://dsp.stackexchange.com/questions/2516/counting-the-number-of-groups-of-1s-in-a-boolean-map-of-numpy-array
 def points_adjoin(p1, p2):
     # to accept diagonal adjacency, use this form
     # return -1 <= p1.x-p2.x <= 1 and -1 <= p1.y-p2.y <= 1
-    return (-1 <= p1.x - p2.x <= 1 and p1.y == p2.y or
-            p1.x == p2.x and -1 <= p1.y - p2.y <= 1)
+    return (
+        -1 <= p1.x - p2.x <= 1
+        and p1.y == p2.y
+        or p1.x == p2.x
+        and -1 <= p1.y - p2.y <= 1
+    )
 
 
 def adjoins(pts, pt):
@@ -101,9 +102,12 @@ def adjoins(pts, pt):
 def locate_regions(datastring):
     data = map(list, datastring.splitlines())
     regions = []
-    datapts = [Point(x, y)
-               for y, row in enumerate(data)
-               for x, value in enumerate(row) if value == '1']
+    datapts = [
+        Point(x, y)
+        for y, row in enumerate(data)
+        for x, value in enumerate(row)
+        if value == "1"
+    ]
     for dp in datapts:
         # find all adjoining regions
         adjregs = [r for r in regions if adjoins(r, dp)]
@@ -120,21 +124,20 @@ def locate_regions(datastring):
 
 
 def part2(s):
-    input_rows = [s + '-' + '{}'.format(n) for n in range(128)]
+    input_rows = [s + "-" + "{}".format(n) for n in range(128)]
     input_rows_hashes = [knot_hash(i) for i in input_rows]
-    input_rows_bin = [''.join(map(to_bin, digits))
-                      for digits in input_rows_hashes]
+    input_rows_bin = ["".join(map(to_bin, digits)) for digits in input_rows_hashes]
     total_sum = 0
     for row in input_rows_bin:
-        total_sum += row.count('1')
-    return len(locate_regions('\n'.join(input_rows_bin)))
+        total_sum += row.count("1")
+    return len(locate_regions("\n".join(input_rows_bin)))
 
 
 def main():
-    print(part1('nbysizxe'))
+    print(part1("nbysizxe"))
     # part2 is from https://dsp.stackexchange.com/questions/2516/counting-the-number-of-groups-of-1s-in-a-boolean-map-of-numpy-array
-    print(part2('nbysizxe'))
+    print(part2("nbysizxe"))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

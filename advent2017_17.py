@@ -14,7 +14,7 @@ import os
 import sys
 import pytest
 
-LOGLEVEL = os.environ.get('LOGLEVEL', 'WARNING').upper()
+LOGLEVEL = os.environ.get("LOGLEVEL", "WARNING").upper()
 log.basicConfig(level=LOGLEVEL)
 
 
@@ -56,5 +56,5 @@ def main():
     part2()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

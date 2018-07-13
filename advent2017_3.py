@@ -54,9 +54,16 @@ def next_direction(direction):
 
 def sum_adjacent(x, y, visited):
     s = 0
-    for adj in (x - 1, y - 1), (x, y - 1), (x + 1, y - 1),\
-            (x - 1, y),  (x + 1, y),\
-            (x - 1, y + 1), (x, y + 1), (x + 1, y + 1):
+    for adj in (
+        (x - 1, y - 1),
+        (x, y - 1),
+        (x + 1, y - 1),
+        (x - 1, y),
+        (x + 1, y),
+        (x - 1, y + 1),
+        (x, y + 1),
+        (x + 1, y + 1),
+    ):
         try:
             _, temp = visited[adj]
             s += temp
@@ -69,7 +76,7 @@ def spiral(n):
     if n == 0:
         return 0, 0, "east", 1
     if n == 1:
-        return 1, 0, 'east', 1
+        return 1, 0, "east", 1
     if n > 1:
         for i in range(n - 1):
             (x, y), (direction, s) = visited.popitem()
@@ -78,16 +85,16 @@ def spiral(n):
                 new_direction = next_direction(direction)
                 new_x, new_y = make_a_step(x, y, new_direction)
                 visited[(new_x, new_y)] = new_direction, sum_adjacent(
-                    new_x, new_y, visited)
+                    new_x, new_y, visited
+                )
             else:
                 new_x, new_y = make_a_step(x, y, direction)
-                visited[(new_x, new_y)] = direction, sum_adjacent(
-                    new_x, new_y, visited)
+                visited[(new_x, new_y)] = direction, sum_adjacent(new_x, new_y, visited)
         print(visited)
         return list(visited.items())[-1]
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     value = 0
     n = 3
     while value <= 361527:

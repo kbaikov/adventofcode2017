@@ -13,7 +13,7 @@ from functools import lru_cache
 from itertools import accumulate, cycle, dropwhile, permutations
 from pprint import pprint
 
-LOGLEVEL = os.environ.get('LOGLEVEL', 'WARNING').upper()
+LOGLEVEL = os.environ.get("LOGLEVEL", "WARNING").upper()
 log.basicConfig(level=LOGLEVEL)
 
 
@@ -37,10 +37,10 @@ def count_groups(node_dict):
     return groups_num
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     node_dict = {}
-    with open('input_advent2017_12.txt') as file:
-        reader = csv.reader(file, delimiter=' ')
+    with open("input_advent2017_12.txt") as file:
+        reader = csv.reader(file, delimiter=" ")
         for row in reader:
             node, _, *children = row
             for i, child in enumerate(children):

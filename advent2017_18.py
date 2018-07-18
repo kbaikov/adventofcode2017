@@ -4,10 +4,8 @@
 import math
 import itertools
 from functools import lru_cache
-from collections import Counter, defaultdict
+from collections import Counter, defaultdict, deque
 from pprint import pprint
-import copy
-from anytree import Node, RenderTree, LevelOrderGroupIter, PreOrderIter, PostOrderIter
 import csv
 import logging as log
 import os
@@ -154,6 +152,58 @@ def process(instructions, registers):
     return instructions, registers
 
 
+def process2(instructions, registers):
+    try:
+        operation, X, Y = instructions[registers["pointer"]]
+    except ValueError:
+        operation, X = instructions[registers["pointer"]]
+
+    if operation == "snd":
+        pass
+
+    if operation == "rcv":
+        pass
+
+    if operation == "jgz":
+        if int(registers[X]) > 0:
+            if Y.lstrip("-").isdigit():
+                registers["pointer"] += int(Y)
+            else:
+                registers["pointer"] += registers[Y]
+        else:
+            registers["pointer"] += 1
+
+    if operation == "set":
+        if Y.lstrip("-").isdigit():
+            registers[X] = int(Y)
+        else:
+            registers[X] = registers[Y]
+        registers["pointer"] += 1
+
+    if operation == "add":
+        if Y.lstrip("-").isdigit():
+            registers[X] += int(Y)
+        else:
+            registers[X] += registers[Y]
+        registers["pointer"] += 1
+
+    if operation == "mul":
+        if Y.lstrip("-").isdigit():
+            registers[X] *= int(Y)
+        else:
+            registers[X] *= registers[Y]
+        registers["pointer"] += 1
+
+    if operation == "mod":
+        if Y.lstrip("-").isdigit():
+            registers[X] %= int(Y)
+        else:
+            registers[X] %= registers[Y]
+        registers["pointer"] += 1
+
+    return instructions, registers
+
+
 TEST_INSTRUCTIONS = """set a 1
 add a 2
 mul a a
@@ -166,15 +216,64 @@ set a 1
 jgz a -2
 """
 
-if __name__ == "__main__":
-    registers = defaultdict(int)
-    registers["pointer"] = 0
-    registers["result"] = 0
-    registers["end_program"] = None
-    with open("input_advent2017_18.txt") as file:
-        instructions = [tuple(line.split()) for line in file.readlines()]
+TEST_INSTRUCTIONS2 = """snd 1
+snd 2
+snd p
+rcv a
+rcv b
+rcv c
+rcv d
+"""
 
-    # instructions = [tuple(line.split()) for line in TEST_INSTRUCTIONS.splitlines()]
-    while not registers["end_program"]:
-        instructions, registers = process(instructions, registers)
-    print(instructions, registers["result"])
+
+class Program:
+    """Represents a program, with an id."""
+
+    # A class variable, counting the number of robots
+    queue0 = deque.deque()
+
+    def __init__(self, id):
+        """Initializes the data."""
+        self.id = id
+        registers = defaultdict(int)
+        registers["pointer"] = 0
+        registers["result"] = 0
+        registers["end_program"] = None
+        registers["p"] = self.id
+        print("(Initializing {0})".format(self.id))
+
+        # When this person is created, the robot
+        # adds to the population
+        Robot.population += 1
+
+    def __del__(self):
+        """I am dying."""
+        print("{0} is being destroyed!".format(self.id))
+
+        
+
+    def snd(self):
+        """send"""
+        print("Greetings, my masters call me {0}.".format(self.id))
+
+    def rcv():
+        """receive"""
+        print("We have {0:d} robots.".format(Robot.population))
+
+    howMany = staticmethod(howMany)
+
+
+if __name__ == "__main__":
+    # registers = defaultdict(int)
+    # registers["pointer"] = 0
+    # registers["result"] = 0
+    # registers["end_program"] = None
+    # with open("input_advent2017_18.txt") as file:
+    #     instructions = [tuple(line.split()) for line in file.readlines()]
+
+    instructions = [tuple(line.split()) for line in TEST_INSTRUCTIONS2.splitlines()]
+    program0 = Program(0)
+    program1 = Program(1)
+    # while not registers["end_program"]:
+    #     instructions, registers = process(instructions, registers)
+    # print(instructions, registers["result"])

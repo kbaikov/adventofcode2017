@@ -6,10 +6,8 @@ name = "pypi"
 [packages]
 pytest = "*"
 anytree = "*"
-black = "*"
 
 [dev-packages]
-black = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3"

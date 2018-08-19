@@ -4,96 +4,16 @@
 import math
 import itertools
 from functools import lru_cache
-from collections import Counter, defaultdict, deque
+from collections import Counter, defaultdict
 from pprint import pprint
 import csv
 import logging as log
 import os
 import pytest
+import queue
 
 LOGLEVEL = os.environ.get("LOGLEVEL", "WARNING").upper()
 log.basicConfig(level=LOGLEVEL)
-
-
-@pytest.mark.parametrize(
-    "input, expected",
-    [
-        (
-            ([("set", "i", "31")], {"i": 0, "pointer": 0, "result": 0}),
-            ([("set", "i", "31")], {"i": 31, "pointer": 1, "result": 0}),
-        ),
-        (
-            ([("set", "i", "a")], {"a": 57, "i": 0, "pointer": 0, "result": 0}),
-            ([("set", "i", "a")], {"a": 57, "i": 57, "pointer": 1, "result": 0}),
-        ),
-        (
-            ([("add", "i", "31")], {"i": 2, "pointer": 0, "result": 0}),
-            ([("add", "i", "31")], {"i": 33, "pointer": 1, "result": 0}),
-        ),
-        (
-            ([("add", "i", "a")], {"a": 2, "i": 3, "pointer": 0, "result": 0}),
-            ([("add", "i", "a")], {"a": 2, "i": 5, "pointer": 1, "result": 0}),
-        ),
-        (
-            ([("mul", "i", "31")], {"i": 2, "pointer": 0, "result": 0}),
-            ([("mul", "i", "31")], {"i": 62, "pointer": 1, "result": 0}),
-        ),
-        (
-            ([("mul", "i", "a")], {"a": 2, "i": 2, "pointer": 0, "result": 0}),
-            ([("mul", "i", "a")], {"a": 2, "i": 4, "pointer": 1, "result": 0}),
-        ),
-        (
-            ([("mod", "i", "10")], {"i": 31, "pointer": 0, "result": 0}),
-            ([("mod", "i", "10")], {"i": 1, "pointer": 1, "result": 0}),
-        ),
-        (
-            ([("mod", "i", "a")], {"a": 10, "i": 31, "pointer": 0, "result": 0}),
-            ([("mod", "i", "a")], {"a": 10, "i": 1, "pointer": 1, "result": 0}),
-        ),
-        (
-            ([("snd", "i")], {"a": 10, "i": 31, "pointer": 0, "result": 0}),
-            ([("snd", "i")], {"a": 10, "i": 31, "pointer": 1, "result": 31}),
-        ),
-        (
-            ([("jgz", "i", "10")], {"i": 0, "pointer": 0, "result": 0}),
-            ([("jgz", "i", "10")], {"i": 0, "pointer": 1, "result": 0}),
-        ),
-        (
-            ([("jgz", "i", "10")], {"i": 1, "pointer": 0, "result": 0}),
-            ([("jgz", "i", "10")], {"i": 1, "pointer": 10, "result": 0}),
-        ),
-        (
-            ([("jgz", "i", "a")], {"a": 10, "i": 1, "pointer": 0, "result": 0}),
-            ([("jgz", "i", "a")], {"a": 10, "i": 1, "pointer": 10, "result": 0}),
-        ),
-        (
-            ([("jgz", "i", "a")], {"a": -5, "i": 1, "pointer": 0, "result": 0}),
-            ([("jgz", "i", "a")], {"a": -5, "i": 1, "pointer": -5, "result": 0}),
-        ),
-        (
-            (
-                [("rcv", "i")],
-                {"a": 10, "i": 1, "pointer": 0, "result": 0, "end_program": None},
-            ),
-            (
-                [("rcv", "i")],
-                {"a": 10, "i": 1, "pointer": 0, "result": 0, "end_program": True},
-            ),
-        ),
-        (
-            (
-                [("rcv", "i")],
-                {"a": 10, "i": 0, "pointer": 0, "result": 0, "end_program": None},
-            ),
-            (
-                [("rcv", "i")],
-                {"a": 10, "i": 0, "pointer": 1, "result": 0, "end_program": None},
-            ),
-        ),
-    ],
-)
-def test_process(input, expected):
-    assert process(*input) == expected
 
 
 def process(instructions, registers):
@@ -111,58 +31,6 @@ def process(instructions, registers):
             registers["end_program"] = True
         else:
             registers["pointer"] += 1
-
-    if operation == "jgz":
-        if int(registers[X]) > 0:
-            if Y.lstrip("-").isdigit():
-                registers["pointer"] += int(Y)
-            else:
-                registers["pointer"] += registers[Y]
-        else:
-            registers["pointer"] += 1
-
-    if operation == "set":
-        if Y.lstrip("-").isdigit():
-            registers[X] = int(Y)
-        else:
-            registers[X] = registers[Y]
-        registers["pointer"] += 1
-
-    if operation == "add":
-        if Y.lstrip("-").isdigit():
-            registers[X] += int(Y)
-        else:
-            registers[X] += registers[Y]
-        registers["pointer"] += 1
-
-    if operation == "mul":
-        if Y.lstrip("-").isdigit():
-            registers[X] *= int(Y)
-        else:
-            registers[X] *= registers[Y]
-        registers["pointer"] += 1
-
-    if operation == "mod":
-        if Y.lstrip("-").isdigit():
-            registers[X] %= int(Y)
-        else:
-            registers[X] %= registers[Y]
-        registers["pointer"] += 1
-
-    return instructions, registers
-
-
-def process2(instructions, registers):
-    try:
-        operation, X, Y = instructions[registers["pointer"]]
-    except ValueError:
-        operation, X = instructions[registers["pointer"]]
-
-    if operation == "snd":
-        pass
-
-    if operation == "rcv":
-        pass
 
     if operation == "jgz":
         if int(registers[X]) > 0:
@@ -229,38 +97,114 @@ rcv d
 class Program:
     """Represents a program, with an id."""
 
-    # A class variable, counting the number of robots
-    queue0 = deque.deque()
-
     def __init__(self, id):
         """Initializes the data."""
+
         self.id = id
-        registers = defaultdict(int)
-        registers["pointer"] = 0
-        registers["result"] = 0
-        registers["end_program"] = None
-        registers["p"] = self.id
-        print("(Initializing {0})".format(self.id))
+        self.q = []
+        self.pointer = 0
+        self.result = 0
+        self.end_program = None
+        self.X = 0
+        self.Y = 0
+        self.p = self.id
+        for value in "abcdefgh":
+            setattr(self, value, 0)
+        print("Initializing program {0}".format(self.id))
+    
+    def get_instructions(self, instructions):
+        self.instructions = instructions
+        while not self.end_program:
+            self.process_instruction(self.instructions[self.pointer])
 
-        # When this person is created, the robot
-        # adds to the population
-        Robot.population += 1
+    def process_instruction(self, instruction):
+        try:
+            self.operation, self.X, self.Y = instruction
+        except ValueError:
+            self.operation, self.X = instruction
+        if self.operation == "set":
+            self.operation = "set_"
+        getattr(self, self.operation)()
 
-    def __del__(self):
-        """I am dying."""
-        print("{0} is being destroyed!".format(self.id))
+    def set_(self):
+        if self.Y.lstrip("-").isdigit():
+            setattr(self, self.X, int(self.Y))
+        else:
+            v = getattr(self, self.Y, 0)
+            setattr(self, self.X, v)
+        self.pointer += 1
 
-        
+    def add(self):
+        if self.Y.lstrip("-").isdigit():
+            s = getattr(self, self.X, 0)
+            setattr(self, self.X, s + int(self.Y))
+        else:
+            s1 = getattr(self, self.X, 0)
+            s2 = getattr(self, self.Y, 0)
+            setattr(self, self.X, s1 + s2)
+        self.pointer += 1
+
+    def mul(self):
+        if self.Y.lstrip("-").isdigit():
+            s = getattr(self, self.X, 0)
+            setattr(self, self.X, s * int(self.Y))
+        else:
+            s1 = getattr(self, self.X, 0)
+            s2 = getattr(self, self.Y, 0)
+            setattr(self, self.X, s1 * s2)
+        self.pointer += 1
+
+    def mod(self):
+        if self.Y.lstrip("-").isdigit():
+            s = getattr(self, self.X, 0)
+            setattr(self, self.X, s % int(self.Y))
+        else:
+            s1 = getattr(self, self.X, 0)
+            s2 = getattr(self, self.Y, 0)
+            setattr(self, self.X, s1 % s2)
+        self.pointer += 1
+
+    def jgz(self):
+        try:
+            x = int(self.X)
+        except ValueError:
+            x = getattr(self, self.X, 0)
+        if x > 0:
+            if self.Y.lstrip("-").isdigit():
+                self.pointer += int(self.Y)
+            else:
+                s = getattr(self, self, Y, 0)
+                self.pointer += s
+        else:
+            self.pointer += 1
 
     def snd(self):
         """send"""
-        print("Greetings, my masters call me {0}.".format(self.id))
 
-    def rcv():
+        if self.X.lstrip("-").isdigit():
+            s = int(self.X)
+        else:
+            s = getattr(self, self.X, 0)
+        if self.id == 0:
+            program1.q.append(s)
+            print("sent {} to program 1".format(s))
+        else:
+            program0.q.append(s)
+            print("sent {} to program 0".format(s))
+        self.pointer += 1
+
+    def rcv(self):
         """receive"""
-        print("We have {0:d} robots.".format(Robot.population))
 
-    howMany = staticmethod(howMany)
+        if not program0.q and not program1.q:
+            self.end_program = True
+        else:
+            if not self.q:
+                return
+            s = self.q.pop(0)
+            setattr(self, self.X, int(s))
+            print("receive {}.".format(s))
+        self.pointer += 1
 
 
 if __name__ == "__main__":
@@ -272,8 +216,24 @@ if __name__ == "__main__":
     #     instructions = [tuple(line.split()) for line in file.readlines()]
 
     instructions = [tuple(line.split()) for line in TEST_INSTRUCTIONS2.splitlines()]
+    print(instructions)
     program0 = Program(0)
     program1 = Program(1)
+
+    # print(program0.q, program1.q)
+    # program0.a = 10
+    # program0.i = -31
+    
+    program1.get_instructions([('snd', '1'), ('snd', '2'), ('snd', 'p'), ('rcv', 'a'), ('rcv', 'b'), ('rcv', 'c'), ('rcv', 'd')])
+    program0.get_instructions([('snd', '1'), ('snd', '2'), ('snd', 'p'), ('rcv', 'a'), ('rcv', 'b'), ('rcv', 'c'), ('rcv', 'd')])
+    
+    # program0.process_instruction([("rcv", "a")])
+    # program0._set()
+    # program0.get_instructions(instructions)
+    # program1.get_instructions(instructions)
+    print(program0.__dict__)
+    print(program0.q, program1.q)
+
     # while not registers["end_program"]:
     #     instructions, registers = process(instructions, registers)
     # print(instructions, registers["result"])

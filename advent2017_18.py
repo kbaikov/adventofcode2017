@@ -101,7 +101,7 @@ class Program:
         """Initializes the data."""
 
         self.id = id
-        self.q = []
+        self.q = queue.Queue()
         self.pointer = 0
         self.result = 0
         self.end_program = None
@@ -186,24 +186,23 @@ class Program:
         else:
             s = getattr(self, self.X, 0)
         if self.id == 0:
-            program1.q.append(s)
+            program1.q.put(s)
             print("sent {} to program 1".format(s))
         else:
-            program0.q.append(s)
+            program0.q.put(s)
             print("sent {} to program 0".format(s))
         self.pointer += 1
 
     def rcv(self):
         """receive"""
 
-        if not program0.q and not program1.q:
+        if program0.q.empty() and program1.q.empty():
             self.end_program = True
         else:
-            if not self.q:
-                return
-            s = self.q.pop(0)
+            s = self.q.get(timeout=2)
             setattr(self, self.X, int(s))
             print("receive {}.".format(s))
+            self.q.task_done()
         self.pointer += 1
 
 
@@ -220,7 +219,7 @@ if __name__ == "__main__":
     program0 = Program(0)
     program1 = Program(1)
 
-    # print(program0.q, program1.q)
+    print(program0.q.qsize(), program1.q.qsize())
     # program0.a = 10
     # program0.i = -31
     
@@ -232,7 +231,7 @@ if __name__ == "__main__":
     # program0.get_instructions(instructions)
     # program1.get_instructions(instructions)
     print(program0.__dict__)
-    print(program0.q, program1.q)
+    print(program0.q.qsize(), program1.q.qsize())
 
     # while not registers["end_program"]:
     #     instructions, registers = process(instructions, registers)

@@ -101,7 +101,8 @@ class Program:
         """Initializes the data."""
 
         self.id = id
-        self.q = queue.Queue()
+        # self.q = queue.Queue()
+        self.q = []
         self.pointer = 0
         self.result = 0
         self.end_program = None
@@ -115,7 +116,10 @@ class Program:
     def get_instructions(self, instructions):
         self.instructions = instructions
         while not self.end_program:
-            self.process_instruction(self.instructions[self.pointer])
+            try:
+                self.process_instruction(self.instructions[self.pointer])
+            except IndexError:
+                self.end_program = True
 
     def process_instruction(self, instruction):
         try:
@@ -186,23 +190,22 @@ class Program:
         else:
             s = getattr(self, self.X, 0)
         if self.id == 0:
-            program1.q.put(s)
-            print("sent {} to program 1".format(s))
+            program1.q.append(s)
+            print(f"sent {s} to program 1")
         else:
-            program0.q.put(s)
-            print("sent {} to program 0".format(s))
+            program0.q.append(s)
+            print(f"sent {s} to program 0")
         self.pointer += 1
 
     def rcv(self):
         """receive"""
 
-        if program0.q.empty() and program1.q.empty():
+        if not program0.q and not program1.q:
             self.end_program = True
         else:
-            s = self.q.get(timeout=2)
+            s = self.q.pop(0)
             setattr(self, self.X, int(s))
-            print("receive {}.".format(s))
-            self.q.task_done()
+            print(f"receive {s}.")
         self.pointer += 1
 
 
@@ -219,19 +222,34 @@ if __name__ == "__main__":
     program0 = Program(0)
     program1 = Program(1)
 
-    print(program0.q.qsize(), program1.q.qsize())
+    # print(program0.q.qsize(), program1.q.qsize())
+    print(program0.q, program1.q)
     # program0.a = 10
     # program0.i = -31
+    from multiprocessing import Process, Pool
     
-    program1.get_instructions([('snd', '1'), ('snd', '2'), ('snd', 'p'), ('rcv', 'a'), ('rcv', 'b'), ('rcv', 'c'), ('rcv', 'd')])
-    program0.get_instructions([('snd', '1'), ('snd', '2'), ('snd', 'p'), ('rcv', 'a'), ('rcv', 'b'), ('rcv', 'c'), ('rcv', 'd')])
+    # program1.get_instructions([('snd', '1'), ('snd', '2'), ('snd', 'p'), ('rcv', 'a'), ('rcv', 'b'), ('rcv', 'c'), ('rcv', 'd')])
+    # program0.get_instructions([('snd', '1'), ('snd', '2'), ('snd', 'p'), ('rcv', 'a'), ('rcv', 'b'), ('rcv', 'c'), ('rcv', 'd')])
+    p0 = Process(target=program0.get_instructions([('snd', '1'), ('snd', '2'), ('snd', 'p')]))
+    p1 = Process(target=program1.get_instructions([('snd', '1'), ('snd', '2'), ('snd', 'p'), ('rcv', 'a')]))
     
+    p1.start()
+    p0.start()
+
+    p1.join()
+    p0.join()
+
+    # pool = Pool(processes=2)
+    # pool.map()
+
+
     # program0.process_instruction([("rcv", "a")])
     # program0._set()
     # program0.get_instructions(instructions)
     # program1.get_instructions(instructions)
     print(program0.__dict__)
-    print(program0.q.qsize(), program1.q.qsize())
+    # print(program0.q.qsize(), program1.q.qsize())
+    print(program0.q, program1.q)
 
     # while not registers["end_program"]:
     #     instructions, registers = process(instructions, registers)

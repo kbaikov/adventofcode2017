@@ -95,9 +95,12 @@ rcv d
 
 
 class Program:
-    """Represents a program, with an id."""
+    """
+    Represents a program, with an id.
+    With the  help of https://github.com/nedbat/adventofcode2017/blob/master/day18.py
+    """
 
-    def __init__(self, id):
+    def __init__(self, id, instructions):
         """Initializes the data."""
 
         self.id = id
@@ -109,25 +112,22 @@ class Program:
         self.X = 0
         self.Y = 0
         self.p = self.id
+        self.num_sent = 0
+        self.ready = True
+        self.instructions = [line.split() for line in instructions]
         for value in "abcdefgh":
             setattr(self, value, 0)
         print("Initializing program {0}".format(self.id))
-    
-    def get_instructions(self, instructions):
-        self.instructions = instructions
-        while not self.end_program:
-            try:
-                self.process_instruction(self.instructions[self.pointer])
-            except IndexError:
-                self.end_program = True
 
-    def process_instruction(self, instruction):
+    def process_instruction(self):
         try:
-            self.operation, self.X, self.Y = instruction
+            self.operation, self.X, self.Y = self.instructions[self.pointer]
         except ValueError:
-            self.operation, self.X = instruction
+            self.operation, self.X = self.instructions[self.pointer]
         if self.operation == "set":
             self.operation = "set_"
+        if self.q:
+            self.ready = True
         getattr(self, self.operation)()
 
     def set_(self):
@@ -177,7 +177,7 @@ class Program:
             if self.Y.lstrip("-").isdigit():
                 self.pointer += int(self.Y)
             else:
-                s = getattr(self, self, Y, 0)
+                s = getattr(self, self.Y, 0)
                 self.pointer += s
         else:
             self.pointer += 1
@@ -191,22 +191,27 @@ class Program:
             s = getattr(self, self.X, 0)
         if self.id == 0:
             program1.q.append(s)
+            program1.ready = True
             print(f"sent {s} to program 1")
         else:
             program0.q.append(s)
+            program0.ready = True
+            program1.num_sent += 1
             print(f"sent {s} to program 0")
         self.pointer += 1
 
     def rcv(self):
         """receive"""
 
-        if not program0.q and not program1.q:
-            self.end_program = True
-        else:
+        if self.q:
             s = self.q.pop(0)
             setattr(self, self.X, int(s))
-            print(f"receive {s}.")
-        self.pointer += 1
+            print(f"Program {self.id} received {s}.")
+            self.pointer += 1
+            self.ready = True
+        else:
+            self.ready = False
+            return
 
 
 if __name__ == "__main__":
@@ -214,42 +219,49 @@ if __name__ == "__main__":
     # registers["pointer"] = 0
     # registers["result"] = 0
     # registers["end_program"] = None
-    # with open("input_advent2017_18.txt") as file:
-    #     instructions = [tuple(line.split()) for line in file.readlines()]
+    with open("input_advent2017_18.txt") as file:
+        instructions = [line for line in file.readlines()]
 
-    instructions = [tuple(line.split()) for line in TEST_INSTRUCTIONS2.splitlines()]
+    # instructions = [line for line in TEST_INSTRUCTIONS2.splitlines()]
     print(instructions)
-    program0 = Program(0)
-    program1 = Program(1)
+    program0 = Program(0, instructions)
+    program1 = Program(1, instructions)
+    while True:
+        if program0.ready:
+            program0.process_instruction()
+        elif program1.ready:
+            program1.process_instruction()
+        else:
+            print(program1.num_sent)
+            break
 
     # print(program0.q.qsize(), program1.q.qsize())
     print(program0.q, program1.q)
     # program0.a = 10
     # program0.i = -31
-    from multiprocessing import Process, Pool
-    
+    # from multiprocessing import Process, Pool
+
     # program1.get_instructions([('snd', '1'), ('snd', '2'), ('snd', 'p'), ('rcv', 'a'), ('rcv', 'b'), ('rcv', 'c'), ('rcv', 'd')])
     # program0.get_instructions([('snd', '1'), ('snd', '2'), ('snd', 'p'), ('rcv', 'a'), ('rcv', 'b'), ('rcv', 'c'), ('rcv', 'd')])
-    p0 = Process(target=program0.get_instructions([('snd', '1'), ('snd', '2'), ('snd', 'p')]))
-    p1 = Process(target=program1.get_instructions([('snd', '1'), ('snd', '2'), ('snd', 'p'), ('rcv', 'a')]))
-    
-    p1.start()
-    p0.start()
+    # p0 = Process(target=program0.get_instructions([('snd', '1'), ('snd', '2'), ('snd', 'p')]))
+    # p1 = Process(target=program1.get_instructions([('snd', '1'), ('snd', '2'), ('snd', 'p'), ('rcv', 'a')]))
 
-    p1.join()
-    p0.join()
+    # p1.start()
+    # p0.start()
+
+    # p1.join()
+    # p0.join()
 
     # pool = Pool(processes=2)
     # pool.map()
-
 
     # program0.process_instruction([("rcv", "a")])
     # program0._set()
     # program0.get_instructions(instructions)
     # program1.get_instructions(instructions)
-    print(program0.__dict__)
+    # print(program0.__dict__)
     # print(program0.q.qsize(), program1.q.qsize())
-    print(program0.q, program1.q)
+    # print(program0.q, program1.q)
 
     # while not registers["end_program"]:
     #     instructions, registers = process(instructions, registers)

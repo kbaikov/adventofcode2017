@@ -12,7 +12,7 @@ import os
 import pytest
 import queue
 
-LOGLEVEL = os.environ.get("LOGLEVEL", "WARNING").upper()
+LOGLEVEL = os.environ.get("LOGLEVEL", "INFO").upper()
 log.basicConfig(level=LOGLEVEL)
 
 
@@ -117,7 +117,7 @@ class Program:
         self.instructions = [line.split() for line in instructions]
         for value in "abcdefgh":
             setattr(self, value, 0)
-        print("Initializing program {0}".format(self.id))
+        log.debug("Initializing program {0}".format(self.id))
 
     def process_instruction(self):
         try:
@@ -192,12 +192,12 @@ class Program:
         if self.id == 0:
             program1.q.append(s)
             program1.ready = True
-            print(f"sent {s} to program 1")
+            log.debug(f"sent {s} to program 1")
         else:
             program0.q.append(s)
             program0.ready = True
             program1.num_sent += 1
-            print(f"sent {s} to program 0")
+            log.debug(f"sent {s} to program 0")
         self.pointer += 1
 
     def rcv(self):
@@ -206,7 +206,7 @@ class Program:
         if self.q:
             s = self.q.pop(0)
             setattr(self, self.X, int(s))
-            print(f"Program {self.id} received {s}.")
+            log.debug(f"Program {self.id} received {s}.")
             self.pointer += 1
             self.ready = True
         else:
@@ -223,7 +223,7 @@ if __name__ == "__main__":
         instructions = [line for line in file.readlines()]
 
     # instructions = [line for line in TEST_INSTRUCTIONS2.splitlines()]
-    print(instructions)
+    log.debug(instructions)
     program0 = Program(0, instructions)
     program1 = Program(1, instructions)
     while True:
@@ -232,11 +232,10 @@ if __name__ == "__main__":
         elif program1.ready:
             program1.process_instruction()
         else:
-            print(program1.num_sent)
+            log.info(program1.num_sent)
             break
 
     # print(program0.q.qsize(), program1.q.qsize())
-    print(program0.q, program1.q)
     # program0.a = 10
     # program0.i = -31
     # from multiprocessing import Process, Pool

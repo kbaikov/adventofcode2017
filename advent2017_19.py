@@ -12,7 +12,7 @@ import os
 import pytest
 import queue
 
-LOGLEVEL = os.environ.get("LOGLEVEL", "DEBUG").upper()
+LOGLEVEL = os.environ.get("LOGLEVEL", "WARNING").upper()
 log.basicConfig(level=LOGLEVEL)
 
 
@@ -23,9 +23,6 @@ TEST_INSTRUCTIONS = """     |
      |  |  |  D 
      +B-+  +--+
 """
-
-
-labyrinth = [line for line in TEST_INSTRUCTIONS.splitlines()]
 
 
 def make_a_step(x, y, direction):
@@ -47,7 +44,7 @@ def next_direction(x, y, direction):
             next = labyrinth[x + 1][y]
         except IndexError:
             next = None
-        if next:
+        if next and next not in ' ':
             return x + 1, y, "south"
         else:
             return x - 1, y, "north"
@@ -56,7 +53,7 @@ def next_direction(x, y, direction):
             next = labyrinth[x][y + 1]
         except IndexError:
             next = None
-        if next:
+        if next and next not in ' ':
             return x, y + 1, "east"
         else:
             return x, y - 1, "west"
@@ -67,7 +64,10 @@ def parse(start_x, start_y, start_direction):
     x, y, char = make_a_step(start_x, start_y, start_direction)
     direction = start_direction
     while True:
-        x, y, char = make_a_step(x, y, direction)
+        try:
+            x, y, char = make_a_step(x, y, direction)
+        except IndexError:
+            break
         s.append(char)
         if char == '+':
             _, _, direction = next_direction(x, y, direction)
@@ -76,7 +76,13 @@ def parse(start_x, start_y, start_direction):
 
 if __name__ == "__main__":
 
-    # with open("input_advent2017_19.txt") as file:
-    #     instructions = [line for line in file.readlines()]
-    start_y = TEST_INSTRUCTIONS.index("|")
-    print(parse(0, start_y, 'south'))
+    with open("input_advent2017_19.txt") as file:
+        instructions = [line for line in file.readlines()]
+    # labyrinth = [line for line in TEST_INSTRUCTIONS.splitlines()]
+    # start_y = TEST_INSTRUCTIONS.index("|")
+    start_y = instructions[0].index("|")
+    labyrinth = instructions
+    full_path = parse(0, start_y, 'south')
+    print(''.join([x for x in full_path if x.isalpha()]))
+
+# LOHMDQATP

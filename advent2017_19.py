@@ -12,7 +12,7 @@ import os
 import pytest
 import queue
 
-LOGLEVEL = os.environ.get("LOGLEVEL", "WARNING").upper()
+LOGLEVEL = os.environ.get("LOGLEVEL", "DEBUG").upper()
 log.basicConfig(level=LOGLEVEL)
 
 
@@ -71,18 +71,20 @@ def parse(start_x, start_y, start_direction):
         s.append(char)
         if char == '+':
             _, _, direction = next_direction(x, y, direction)
-        log.debug(s)
+        if char == ' ':
+            break
+    log.debug(s)
     return s
 
 if __name__ == "__main__":
 
     with open("input_advent2017_19.txt") as file:
         instructions = [line for line in file.readlines()]
-    # labyrinth = [line for line in TEST_INSTRUCTIONS.splitlines()]
-    # start_y = TEST_INSTRUCTIONS.index("|")
-    start_y = instructions[0].index("|")
+    # instructions = labyrinth = [line for line in TEST_INSTRUCTIONS.splitlines()]
     labyrinth = instructions
+    start_y = TEST_INSTRUCTIONS.index("|")
+    start_y = instructions[0].index("|")
     full_path = parse(0, start_y, 'south')
-    print(''.join([x for x in full_path if x.isalpha()]))
+    print(''.join([x for x in full_path if x.isalpha()]), len(full_path))
 
 # LOHMDQATP

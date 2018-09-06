@@ -19,12 +19,11 @@ log.basicConfig(level=LOGLEVEL)
 
 class Particle:
     all_particles = {}
+    collisions = 0
 
     def __init__(self, id, s):
         self.id = id
-        self.px, self.py, self.pz, self.vx, self.vy, self.vz, self.ax, self.ay, self.az = (
-            s
-        )
+        self.px, self.py, self.pz, self.vx, self.vy, self.vz, self.ax, self.ay, self.az = s
         Particle.all_particles[self] = self.distance
 
     @property
@@ -44,13 +43,29 @@ class Particle:
     def report(cls):
         print(cls.all_particles)
 
+    @classmethod
+    def check_unique(cls):
+        coords_list = [(p.px, p.py, p.pz) for p in cls.all_particles]
+        c = Counter(coords_list)
+        log.debug(c)
+        unique_coords_list = [x for x in c if c[x] == 1]
+
+        for coord in unique_coords_list:
+            for particle in cls.all_particles.copy():
+                if coord == (particle.px, particle.py, particle.pz):
+                    del cls.all_particles[particle]
+        # cls.all_particles = not_collided
+        # print(coords_dict.values(), len(coords_dict))
+    
+
 
 if __name__ == "__main__":
 
-    with open("input_advent2017_20.txt") as file:
-        lines = [line for line in file.readlines()]
+    # with open("input_advent2017_20.txt") as file:
+    #     lines = [line for line in file.readlines()]
 
-    # line = ["p=< 3,0,0>, v=< 2,0,0>, a=<-1,0,0>", "p=< 4,0,0>, v=< 0,0,0>, a=<-2,0,0>"]
+    lines = ["p=<-6,0,0>, v=< 3,0,0>, a=< 0,0,0>", "p=<-4,0,0>, v=< 2,0,0>, a=< 0,0,0>",
+    'p=<-2,0,0>, v=< 1,0,0>, a=< 0,0,0>', 'p=< 3,0,0>, v=<-1,0,0>, a=< 0,0,0>']
 
     # s = re.findall("[-\d]+", line)
     for p_id, particle_string in enumerate(lines, start=0):
@@ -60,10 +75,14 @@ if __name__ == "__main__":
     # print(p.px, p.manhattan_distance())
     # p.simulate(4)
     # print(p.px, p.manhattan_distance())
-    for en in Particle.all_particles:
-        en.simulate(1000)
+    print(len(Particle.all_particles))
+    for _ in range(2):
+        for en in Particle.all_particles.copy():
+            en.simulate(1)
+        Particle.check_unique()
 
     a = sorted(Particle.all_particles, key=lambda particle: particle.distance)
-    print(a[0].id, a[0].distance)
+    # print(a[0].id, a[0].distance)
+    print(len(Particle.all_particles))
     # print(en.id, en.px, en.manhattan_distance())
 

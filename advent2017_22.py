@@ -63,19 +63,20 @@ class Carrier:
 
 if __name__ == "__main__":
 
-    # with open("input_advent2017_22.txt") as file:
-    #     lines = [line for line in file.readlines()]
-    grid_X = grid_Y = 2500
-    carrier_X = carrier_Y = grid_X // 2 + 1
-    Carrier.grid = [["." for _ in range(grid_X)] for _ in range(grid_Y)]
-    Carrier.grid[carrier_Y][carrier_X - 1] = "#"
-    Carrier.grid[carrier_Y - 1][carrier_X + 1] = "#"
+    with open("input_advent2017_22.txt") as file:
+        lines = [list(line.strip()) for line in file.readlines()]
+    # grid_X = grid_Y = 1500
+    carrier_X = carrier_Y = len(lines[0]) // 2 + 1
+    Carrier.grid = lines
+    # Carrier.grid[carrier_Y][carrier_X - 1] = "#"
+    # Carrier.grid[carrier_Y - 1][carrier_X + 1] = "#"
     c = Carrier(carrier_X, carrier_Y)
-    number_of_bursts = 10000
+    number_of_bursts = 300
+    # pprint(lines, width=80, depth=80)
     for _ in range(number_of_bursts):
         c.burst()
     # pprint(Carrier.grid)
 
-    # for line in Carrier.grid:
-    #     print("".join(line))
+    for line in Carrier.grid:
+        print("".join(line))
 

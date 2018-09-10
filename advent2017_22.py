@@ -64,6 +64,60 @@ class Carrier:
         log.debug(f"Current coordinates x = {self.x}; y = {self.y}")
 
 
+class Carrier2:
+    grid = defaultdict(lambda: ".")
+    directions = deque(["up", "right", "down", "left"])
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.direction = Carrier.directions[0]
+        self.infections = 0
+
+    def current_possition_value(self):
+        return Carrier.grid[(self.x, self.y)]
+
+    def get_new_direction(self):
+        if self.current_possition_value() == "#":
+            Carrier.directions.rotate(-1)
+            self.direction = Carrier.directions[0]
+        elif self.current_possition_value() == ".":
+            Carrier.directions.rotate(1)
+            self.direction = Carrier.directions[0]
+        elif self.current_possition_value() == "f":
+            Carrier.directions.rotate(2)
+            self.direction = Carrier.directions[0]
+
+    def infect_clean(self):
+        if self.current_possition_value() == "#":
+            Carrier.grid[(self.x, self.y)] = "f"
+        elif self.current_possition_value() == ".":
+            Carrier.grid[(self.x, self.y)] = "w"
+        elif self.current_possition_value() == "w":
+            Carrier.grid[(self.x, self.y)] = "#"
+            self.infections += 1
+        elif self.current_possition_value() == "f":
+            Carrier.grid[(self.x, self.y)] = "."
+
+    def move(self):
+        if self.direction == "up":
+            self.y -= 1
+        elif self.direction == "right":
+            self.x += 1
+        elif self.direction == "down":
+            self.y += 1
+        elif self.direction == "left":
+            self.x -= 1
+
+    def burst(self):
+        self.get_new_direction()
+        # log.debug(f"New direction is {self.direction}")
+        self.infect_clean()
+        # log.debug(f"Current infections {self.infections}")
+        self.move()
+        # log.debug(f"Current coordinates x = {self.x}; y = {self.y}")
+
+
 if __name__ == "__main__":
 
     with open("input_advent2017_22.txt") as file:
@@ -80,13 +134,15 @@ if __name__ == "__main__":
     carrier_Y = len(lines) // 2
     # Carrier.grid[carrier_Y][carrier_X - 1] = "#"
     # Carrier.grid[carrier_Y - 1][carrier_X + 1] = "#"
-    c = Carrier(carrier_X, carrier_Y)
-    number_of_bursts = 10_000
+    c = Carrier2(carrier_X, carrier_Y)
+    number_of_bursts = 10_000_000
     # pprint(lines, width=80, depth=80)
     for _ in range(number_of_bursts):
         # for line in Carrier.grid:
         #     print("".join(line))
         c.burst()
+    log.debug(f"Current infections {c.infections}")
+    # 2512599
     # pprint(Carrier.grid)
 
     # not 6046

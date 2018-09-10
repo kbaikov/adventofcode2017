@@ -18,7 +18,7 @@ log.basicConfig(level=LOGLEVEL)
 
 
 class Carrier:
-    grid = None
+    grid = defaultdict(lambda: ".")
     directions = deque(["up", "right", "down", "left"])
 
     def __init__(self, x, y):
@@ -27,19 +27,22 @@ class Carrier:
         self.direction = Carrier.directions[0]
         self.infections = 0
 
+    def current_possition_value(self):
+        return Carrier.grid[(self.x, self.y)]
+
     def get_new_direction(self):
-        if Carrier.grid[self.y][self.x] == "#":
+        if self.current_possition_value() == "#":
             Carrier.directions.rotate(-1)
             self.direction = Carrier.directions[0]
-        else:
+        elif self.current_possition_value() == ".":
             Carrier.directions.rotate(1)
             self.direction = Carrier.directions[0]
 
     def infect_clean(self):
-        if Carrier.grid[self.y][self.x] == "#":
-            Carrier.grid[self.y][self.x] = "."
-        else:
-            Carrier.grid[self.y][self.x] = "#"
+        if self.current_possition_value() == "#":
+            Carrier.grid[(self.x, self.y)] = "."
+        elif self.current_possition_value() == ".":
+            Carrier.grid[(self.x, self.y)] = "#"
             self.infections += 1
 
     def move(self):
@@ -66,17 +69,27 @@ if __name__ == "__main__":
     with open("input_advent2017_22.txt") as file:
         lines = [list(line.strip()) for line in file.readlines()]
     # grid_X = grid_Y = 1500
-    carrier_X = carrier_Y = len(lines[0]) // 2 + 1
-    Carrier.grid = lines
+    for y, li in enumerate(lines):
+        for x, char in enumerate(li):
+            Carrier.grid[(x, y)] = char
+
+    print(Carrier.grid)
+    # Carrier.grid = lines
+    # Carrier.grid = massage(Carrier.grid, 6)
+    carrier_X = len(lines) // 2
+    carrier_Y = len(lines) // 2
     # Carrier.grid[carrier_Y][carrier_X - 1] = "#"
     # Carrier.grid[carrier_Y - 1][carrier_X + 1] = "#"
     c = Carrier(carrier_X, carrier_Y)
-    number_of_bursts = 300
+    number_of_bursts = 10_000
     # pprint(lines, width=80, depth=80)
     for _ in range(number_of_bursts):
+        # for line in Carrier.grid:
+        #     print("".join(line))
         c.burst()
     # pprint(Carrier.grid)
 
-    for line in Carrier.grid:
-        print("".join(line))
-
+    # not 6046
+    # not 5017
+    # a = [["a"], ["b"]]
+    # print(massage(a, 1))

@@ -115,8 +115,9 @@ class Program:
         self.num_sent = 0
         self.ready = True
         self.mul_times = 0
+        self.a = 1
         self.instructions = [line.split() for line in instructions]
-        for value in "abcdefgh":
+        for value in "bcdefgh":
             setattr(self, value, 0)
         log.debug("Initializing program {0}".format(self.id))
 
@@ -240,6 +241,6 @@ if __name__ == "__main__":
     program1 = Program(1, instructions)
     while True:
         program0.process_instruction()
-        print(program0.mul_times)
+        print(program0.mul_times, program0.pointer, program0.h)
 
     # Part1: 4225

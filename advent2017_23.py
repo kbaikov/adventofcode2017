@@ -227,6 +227,36 @@ class Program:
             return
 
 
+def assembler():
+    """Taken from https://github.com/norvig/pytudes/blob/master/ipynb/Advent%202017.ipynb"""
+    a = 1
+    d = e = f = g = h = 0
+    b = 67
+    c = b
+    if a != 0:
+        b *= 100
+        b += 100_000
+        c = b
+        c += 17000
+        while True:
+            f = 1
+            d = 2
+            e = 2
+            while True:
+                if b % d == 0:
+                    f = 0
+                d += 1
+                g = d - b
+                if g == 0:
+                    if f == 0:
+                        h += 1
+                    g = b - c
+                    if g == 0:
+                        return h
+                    b += 17
+                    break
+
+
 if __name__ == "__main__":
     # registers = defaultdict(int)
     # registers["pointer"] = 0
@@ -239,8 +269,9 @@ if __name__ == "__main__":
     log.debug(instructions)
     program0 = Program(0, instructions)
     program1 = Program(1, instructions)
-    while True:
-        program0.process_instruction()
-        print(program0.mul_times, program0.pointer, program0.h)
-
+    # while True:
+    #     program0.process_instruction()
+    # print(program0.mul_times, program0.pointer, program0.h)
+    print(assembler())
     # Part1: 4225
+    # Part2: 905

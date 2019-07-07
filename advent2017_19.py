@@ -25,8 +25,7 @@ TEST_INSTRUCTIONS = """     |
 """
 
 
-def make_a_step(x, y, direction):
-    global labyrinth
+def make_a_step(x, y, direction, labyrinth):
     if direction == "east":
         return (x, y + 1, labyrinth[x][y + 1])
     elif direction == "north":
@@ -37,8 +36,7 @@ def make_a_step(x, y, direction):
         return (x + 1, y, labyrinth[x + 1][y])
 
 
-def next_direction(x, y, direction):
-    global labyrinth
+def next_direction(x, y, direction, labyrinth):
     if direction in ["east", "west"]:
         try:
             next = labyrinth[x + 1][y]
@@ -59,18 +57,18 @@ def next_direction(x, y, direction):
             return x, y - 1, "west"
 
 
-def parse(start_x, start_y, start_direction):
+def parse(start_x, start_y, start_direction, labyrinth):
     s = ['|']
-    x, y, char = make_a_step(start_x, start_y, start_direction)
+    x, y, char = make_a_step(start_x, start_y, start_direction, labyrinth)
     direction = start_direction
     while True:
         try:
-            x, y, char = make_a_step(x, y, direction)
+            x, y, char = make_a_step(x, y, direction, labyrinth)
         except IndexError:
             break
         s.append(char)
         if char == '+':
-            _, _, direction = next_direction(x, y, direction)
+            _, _, direction = next_direction(x, y, direction, labyrinth)
         if char == ' ':
             break
     log.debug(s)
@@ -82,9 +80,9 @@ if __name__ == "__main__":
         instructions = [line for line in file.readlines()]
     # instructions = labyrinth = [line for line in TEST_INSTRUCTIONS.splitlines()]
     labyrinth = instructions
-    start_y = TEST_INSTRUCTIONS.index("|")
+    # start_y = TEST_INSTRUCTIONS.index("|")
     start_y = instructions[0].index("|")
-    full_path = parse(0, start_y, 'south')
+    full_path = parse(0, start_y, 'south', labyrinth)
     print(''.join([x for x in full_path if x.isalpha()]), len(full_path))
 
 # LOHMDQATP

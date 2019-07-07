@@ -3,6 +3,12 @@ import pytest
 from advent2017_19 import next_direction, make_a_step
 
 
+@pytest.fixture
+def labyrinth():
+    from advent2017_19 import TEST_INSTRUCTIONS
+    return [line for line in TEST_INSTRUCTIONS.splitlines()]
+
+
 @pytest.mark.parametrize(
     "input, expected",
     [
@@ -12,8 +18,8 @@ from advent2017_19 import next_direction, make_a_step
         ((5, 8, "east"), (4, 8, "north")),
     ],
 )
-def test_next_direction(input, expected):
-    assert next_direction(*input) == expected
+def test_next_direction(input, expected, labyrinth):
+    assert next_direction(*input, labyrinth=labyrinth) == expected
 
 
 @pytest.mark.parametrize(
@@ -25,5 +31,5 @@ def test_next_direction(input, expected):
         ((4, 8, "north"), (3, 8, "-")),
     ],
 )
-def test_make_a_step(input, expected):
-    assert make_a_step(*input) == expected
+def test_make_a_step(input, expected, labyrinth):
+    assert make_a_step(*input, labyrinth=labyrinth) == expected
